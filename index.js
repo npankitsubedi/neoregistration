@@ -222,28 +222,13 @@ async function generateAdmitCard(details, imageBuffer, imageMimeType) {
         throw new Error('Unsupported image format');
     }
 
-    const imageDims = image.scale(1);
-    const imageWidth = imageDims.width;
-    const imageHeight = imageDims.height;
-    
-    const maxWidth = 182;
-    const maxHeight = 122;
-
-    let newWidth = imageWidth;
-    let newHeight = imageHeight;
-    if (newWidth > maxWidth || newHeight > maxHeight) {
-        const widthRatio = maxWidth / newWidth;
-        const heightRatio = maxHeight / newHeight;
-        const scaleRatio = Math.min(widthRatio, heightRatio);
-        newWidth = newWidth * scaleRatio;
-        newHeight = newHeight * scaleRatio;
-    }
+    const imageDims = image.scale(0.25);
 
     firstPage.drawImage(image, {
-        x: width - 182,
-        y: height - 122,
-        width: newWidth,
-        height: newHeight,
+        x: width - 200,
+        y: height - 395,  // Adjust this value to shift the image up
+        width: imageDims.width,
+        height: imageDims.height,
     });
 
     const pdfBytes = await pdfDoc.save();
