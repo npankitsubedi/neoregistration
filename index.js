@@ -198,12 +198,12 @@ async function generateAdmitCard(details, imageBuffer, imageMimeType) {
     const { width, height } = firstPage.getSize();
 
     const positions = {
-        symbolNumber: { x: 64, y: height - 138 },
-        name: { x: 64, y: height - 158 },
-        contactNumber: { x: 64, y: height - 178 },
-        date: { x: 64, y: height - 198 },
-        schoolName: { x: 64, y: height - 218 },
-        nearestExamCenter: { x: 64, y: height - 238 },
+        symbolNumber: { x: 64 / 25.4 * 72, y: height - (84 / 25.4 * 72) },
+        name: { x: 64 / 25.4 * 72, y: height - (94 / 25.4 * 72) },
+        contactNumber: { x: 64 / 25.4 * 72, y: height - (104 / 25.4 * 72) },
+        date: { x: 64 / 25.4 * 72, y: height - (114 / 25.4 * 72) },
+        schoolName: { x: 64 / 25.4 * 72, y: height - (124 / 25.4 * 72) },
+        nearestExamCenter: { x: 64 / 25.4 * 72, y: height - (134 / 25.4 * 72) },
     };
 
     firstPage.drawText(symbolNumber, { x: positions.symbolNumber.x, y: positions.symbolNumber.y, size: 12, color: rgb(0, 0, 0) });
@@ -223,18 +223,19 @@ async function generateAdmitCard(details, imageBuffer, imageMimeType) {
     }
 
     const imageDims = image.scale(0.25);
+    const moveUpPoints = 4 / 25.4 * 72; 
 
     firstPage.drawImage(image, {
-        x: width - 200,
-        y: height - 395,  // Adjust this value to shift the image up
-        width: imageDims.width,
-        height: imageDims.height,
-    });
+        x: 141 / 25.4 * 72,
+        y: height - (84 / 25.4 * 72 + imageDims.height) + moveUpPoints, 
+    width: Math.min(imageDims.width, 182 / 25.4 * 72),
+    height: Math.min(imageDims.height, 122 / 25.4 * 72),
+});
+
 
     const pdfBytes = await pdfDoc.save();
     return pdfBytes;
 }
-
 
 const server = app.listen(3000, () => {
     console.log('Server is running on port 3000');
