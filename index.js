@@ -198,12 +198,12 @@ async function generateAdmitCard(details, imageBuffer, imageMimeType) {
     const { width, height } = firstPage.getSize();
 
     const positions = {
-        symbolNumber: { x: 150, y: height - 180 },
-        name: { x: 150, y: height - 200 },
-        contactNumber: { x: 150, y: height - 220 },
-        date: { x: 150, y: height - 240 },
-        schoolName: { x: 150, y: height - 260 },
-        nearestExamCenter: { x: 150, y: height - 280 },
+        symbolNumber: { x: 64 / 25.4 * 72, y: height - (84 / 25.4 * 72) },
+        name: { x: 64 / 25.4 * 72, y: height - (94 / 25.4 * 72) },
+        contactNumber: { x: 64 / 25.4 * 72, y: height - (104 / 25.4 * 72) },
+        date: { x: 64 / 25.4 * 72, y: height - (114 / 25.4 * 72) },
+        schoolName: { x: 64 / 25.4 * 72, y: height - (124 / 25.4 * 72) },
+        nearestExamCenter: { x: 64 / 25.4 * 72, y: height - (134 / 25.4 * 72) },
     };
 
     firstPage.drawText(symbolNumber, { x: positions.symbolNumber.x, y: positions.symbolNumber.y, size: 12, color: rgb(0, 0, 0) });
@@ -221,18 +221,20 @@ async function generateAdmitCard(details, imageBuffer, imageMimeType) {
     } else {
         throw new Error('Unsupported image format');
     }
+
     const imageDims = image.scale(0.25);
 
     firstPage.drawImage(image, {
-        x: width - 200,
-        y: height - 400,
-        width: imageDims.width,
-        height: imageDims.height,
+        x: 141 / 25.4 * 72,
+        y: height - (84 / 25.4 * 72 + imageDims.height),
+        width: Math.min(imageDims.width, 182 / 25.4 * 72),
+        height: Math.min(imageDims.height, 122 / 25.4 * 72),
     });
 
     const pdfBytes = await pdfDoc.save();
     return pdfBytes;
 }
+
 const server = app.listen(3000, () => {
     console.log('Server is running on port 3000');
 });
