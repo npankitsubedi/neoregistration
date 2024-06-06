@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const resendOtpTimer = document.getElementById("resendOtpTimer");
     const timerElement = document.getElementById("timer");
     const thankYouMessage = document.getElementById("thankYouMessage");
-    const photoError = document.querySelector(".photo-error");
+    const loading = document.getElementById("loading");
 
     let emailVerified = false;
     let timer;
@@ -45,7 +45,8 @@ document.addEventListener("DOMContentLoaded", () => {
     sendOtpButton.addEventListener("click", () => {
         const email = emailInput.value;
         const name = nameInput.value;
-        const sendOtpMessageContainer = document.querySelector(".send-otp-message");
+        const sendOtpMessageContainer =
+            document.querySelector(".send-otp-message");
 
         if (email && name) {
             fetch("/send-otp", {
@@ -59,27 +60,46 @@ document.addEventListener("DOMContentLoaded", () => {
                 .then((data) => {
                     if (data === "OTP sent") {
                         otpSection.style.display = "block";
-                        displayMessage("OTP sent to your email.", "success", sendOtpMessageContainer);
+                        displayMessage(
+                            "OTP sent to your email.",
+                            "success",
+                            sendOtpMessageContainer,
+                        );
                         sendOtpButton.disabled = true;
                         startTimer(60);
                     } else {
-                        displayMessage("Error sending OTP. Please try again.", "error", sendOtpMessageContainer);
+                        displayMessage(
+                            "Error sending OTP. Please try again.",
+                            "error",
+                            sendOtpMessageContainer,
+                        );
                     }
                 })
                 .catch((error) => {
-                    displayMessage("Error sending OTP. Please try again.", "error", sendOtpMessageContainer);
+                    displayMessage(
+                        "Error sending OTP. Please try again.",
+                        "error",
+                        sendOtpMessageContainer,
+                    );
                     console.error("Error:", error);
                 });
         } else {
-            displayMessage("Please enter your name and email address.", "error", sendOtpMessageContainer);
+            displayMessage(
+                "Please enter your name and email address.",
+                "error",
+                sendOtpMessageContainer,
+            );
         }
     });
 
     verifyOtpButton.addEventListener("click", () => {
         const email = emailInput.value;
         const otp = otpInput.value;
-        const verifyOtpMessageContainer = document.querySelector(".verify-otp-message");
-        const sendOtpMessageContainer = document.querySelector(".send-otp-message");
+        const verifyOtpMessageContainer = document.querySelector(
+            ".verify-otp-message",
+        );
+        const sendOtpMessageContainer =
+            document.querySelector(".send-otp-message");
 
         if (email && otp) {
             fetch("/verify-otp", {
@@ -93,41 +113,46 @@ document.addEventListener("DOMContentLoaded", () => {
                 .then((data) => {
                     if (data === "OTP verified") {
                         emailVerified = true;
-                        displayMessage("OTP verified successfully.", "success", sendOtpMessageContainer);
+                        displayMessage(
+                            "OTP verified successfully.",
+                            "success",
+                            sendOtpMessageContainer,
+                        );
                         otpSection.style.display = "none";
                         step1.style.display = "none";
                         step2.style.display = "block";
-                        registerButton.disabled = false; 
+                        registerButton.disabled = false;
                     } else {
-                        displayMessage("Invalid OTP. Please try again.", "error", verifyOtpMessageContainer);
+                        displayMessage(
+                            "Invalid OTP. Please try again.",
+                            "error",
+                            verifyOtpMessageContainer,
+                        );
                     }
                 })
                 .catch((error) => {
-                    displayMessage("Error verifying OTP. Please try again.", "error", verifyOtpMessageContainer);
+                    displayMessage(
+                        "Error verifying OTP. Please try again.",
+                        "error",
+                        verifyOtpMessageContainer,
+                    );
                     console.error("Error:", error);
                 });
         } else {
-            displayMessage("Please enter the OTP.", "error", verifyOtpMessageContainer);
-        }
-    });
-
-    photoInput.addEventListener("change", () => {
-        const photo = photoInput.files[0];
-        if (photo) {
-            const validTypes = ["image/jpeg", "image/png"];
-            if (!validTypes.includes(photo.type) || photo.size > 500 * 1024) {
-                photoError.style.display = "block";
-                photoInput.value = ""; 
-            } else {
-                photoError.style.display = "none";
-            }
+            displayMessage(
+                "Please enter the OTP.",
+                "error",
+                verifyOtpMessageContainer,
+            );
         }
     });
 
     registrationForm.addEventListener("submit", (event) => {
-        event.preventDefault(); 
+        event.preventDefault();
 
-        const requiredInputs = registrationForm.querySelectorAll("input[required]");
+        const photo = photoInput.files[0];
+        const requiredInputs =
+            registrationForm.querySelectorAll("input[required]");
         let allFilled = true;
 
         requiredInputs.forEach((input) => {
@@ -137,19 +162,56 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         if (!allFilled) {
-            displayMessage("Please fill all the fields before proceeding.", "error", messageContainer);
+            displayMessage(
+                "Please fill all the fields before proceeding.",
+                "error",
+                messageContainer,
+            );
             return;
         }
 
-        if (photoInput.value === "") {
-            displayMessage("Please upload a photo", "error", photoInput.parentElement);
+        if (photo) {
+            const validTypes = ["image/jpeg", "image/png"];
+            if (!validTypes.includes(photo.type)) {
+                displayMessage(
+                    "Photo must be in .jpg, .jpeg, or .png format",
+                    "error",
+                    photoInput.parentElement,
+                );
+                return;
+            }
+            if (photo.size > 500 * 1024) {
+                displayMessage(
+                    "Photo must not exceed 500KB",
+                    "error",
+                    photoInput.parentElement,
+                );
+                return;
+            }
+        } else {
+            displayMessage(
+                "Please upload a photo",
+                "error",
+                photoInput.parentElement,
+            );
             return;
         }
 
         if (!emailVerified) {
-            displayMessage("Error: Verify your email first!", "error", messageContainer);
+            displayMessage(
+                "Error: Verify your email first!",
+                "error",
+                messageContainer,
+            );
             return;
         }
+
+        registerButton.disabled = true;
+        setTimeout(() => {
+            registerButton.disabled = false;
+        }, 30000);
+
+        loading.style.display = "block";
 
         const formData = new FormData(registrationForm);
         fetch("/register", {
@@ -158,6 +220,7 @@ document.addEventListener("DOMContentLoaded", () => {
         })
             .then((response) => response.text())
             .then((data) => {
+                loading.style.display = "none";
                 if (data === "Registration successful") {
                     registrationForm.style.display = "none";
                     thankYouMessage.style.display = "block";
@@ -166,7 +229,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             })
             .catch((error) => {
-                displayMessage("Error registering. Please try again.", "error", messageContainer);
+                loading.style.display = "none";
+                displayMessage(
+                    "Error registering. Please try again.",
+                    "error",
+                    messageContainer,
+                );
                 console.error("Error:", error);
             });
     });
