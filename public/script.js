@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const resendOtpTimer = document.getElementById("resendOtpTimer");
     const timerElement = document.getElementById("timer");
     const thankYouMessage = document.getElementById("thankYouMessage");
+    const photoError = document.querySelector(".photo-error");
 
     let emailVerified = false;
     let timer;
@@ -96,7 +97,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         otpSection.style.display = "none";
                         step1.style.display = "none";
                         step2.style.display = "block";
-                        registerButton.disabled = false;
+                        registerButton.disabled = false; 
                     } else {
                         displayMessage("Invalid OTP. Please try again.", "error", verifyOtpMessageContainer);
                     }
@@ -110,10 +111,22 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    registrationForm.addEventListener("submit", (event) => {
-        event.preventDefault();
-
+    photoInput.addEventListener("change", () => {
         const photo = photoInput.files[0];
+        if (photo) {
+            const validTypes = ["image/jpeg", "image/png"];
+            if (!validTypes.includes(photo.type) || photo.size > 500 * 1024) {
+                photoError.style.display = "block";
+                photoInput.value = ""; 
+            } else {
+                photoError.style.display = "none";
+            }
+        }
+    });
+
+    registrationForm.addEventListener("submit", (event) => {
+        event.preventDefault(); 
+
         const requiredInputs = registrationForm.querySelectorAll("input[required]");
         let allFilled = true;
 
@@ -128,17 +141,7 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        if (photo) {
-            const validTypes = ["image/jpeg", "image/png"];
-            if (!validTypes.includes(photo.type)) {
-                displayMessage("Photo must be in .jpg, .jpeg, or .png format", "error", photoInput.parentElement);
-                return;
-            }
-            if (photo.size > 500 * 1024) {
-                displayMessage("Photo must not exceed 500KB", "error", photoInput.parentElement);
-                return;
-            }
-        } else {
+        if (photoInput.value === "") {
             displayMessage("Please upload a photo", "error", photoInput.parentElement);
             return;
         }
