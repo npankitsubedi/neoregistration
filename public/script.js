@@ -44,8 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
     sendOtpButton.addEventListener("click", () => {
         const email = emailInput.value;
         const name = nameInput.value;
-        const sendOtpMessageContainer =
-            document.querySelector(".send-otp-message");
+        const sendOtpMessageContainer = document.querySelector(".send-otp-message");
 
         if (email && name) {
             fetch("/send-otp", {
@@ -59,46 +58,27 @@ document.addEventListener("DOMContentLoaded", () => {
                 .then((data) => {
                     if (data === "OTP sent") {
                         otpSection.style.display = "block";
-                        displayMessage(
-                            "OTP sent to your email.",
-                            "success",
-                            sendOtpMessageContainer,
-                        );
+                        displayMessage("OTP sent to your email.", "success", sendOtpMessageContainer);
                         sendOtpButton.disabled = true;
-                        startTimer(60); // 1 minute timer for resending OTP
+                        startTimer(60);
                     } else {
-                        displayMessage(
-                            "Error sending OTP. Please try again.",
-                            "error",
-                            sendOtpMessageContainer,
-                        );
+                        displayMessage("Error sending OTP. Please try again.", "error", sendOtpMessageContainer);
                     }
                 })
                 .catch((error) => {
-                    displayMessage(
-                        "Error sending OTP. Please try again.",
-                        "error",
-                        sendOtpMessageContainer,
-                    );
+                    displayMessage("Error sending OTP. Please try again.", "error", sendOtpMessageContainer);
                     console.error("Error:", error);
                 });
         } else {
-            displayMessage(
-                "Please enter your name and email address.",
-                "error",
-                sendOtpMessageContainer,
-            );
+            displayMessage("Please enter your name and email address.", "error", sendOtpMessageContainer);
         }
     });
 
     verifyOtpButton.addEventListener("click", () => {
         const email = emailInput.value;
         const otp = otpInput.value;
-        const verifyOtpMessageContainer = document.querySelector(
-            ".verify-otp-message",
-        );
-        const sendOtpMessageContainer =
-            document.querySelector(".send-otp-message");
+        const verifyOtpMessageContainer = document.querySelector(".verify-otp-message");
+        const sendOtpMessageContainer = document.querySelector(".send-otp-message");
 
         if (email && otp) {
             fetch("/verify-otp", {
@@ -112,46 +92,29 @@ document.addEventListener("DOMContentLoaded", () => {
                 .then((data) => {
                     if (data === "OTP verified") {
                         emailVerified = true;
-                        displayMessage(
-                            "OTP verified successfully.",
-                            "success",
-                            sendOtpMessageContainer,
-                        );
+                        displayMessage("OTP verified successfully.", "success", sendOtpMessageContainer);
                         otpSection.style.display = "none";
                         step1.style.display = "none";
                         step2.style.display = "block";
-                        registerButton.disabled = false; // Enable the register button
+                        registerButton.disabled = false;
                     } else {
-                        displayMessage(
-                            "Invalid OTP. Please try again.",
-                            "error",
-                            verifyOtpMessageContainer,
-                        );
+                        displayMessage("Invalid OTP. Please try again.", "error", verifyOtpMessageContainer);
                     }
                 })
                 .catch((error) => {
-                    displayMessage(
-                        "Error verifying OTP. Please try again.",
-                        "error",
-                        verifyOtpMessageContainer,
-                    );
+                    displayMessage("Error verifying OTP. Please try again.", "error", verifyOtpMessageContainer);
                     console.error("Error:", error);
                 });
         } else {
-            displayMessage(
-                "Please enter the OTP.",
-                "error",
-                verifyOtpMessageContainer,
-            );
+            displayMessage("Please enter the OTP.", "error", verifyOtpMessageContainer);
         }
     });
 
     registrationForm.addEventListener("submit", (event) => {
-        event.preventDefault(); // Prevent the default form submission
+        event.preventDefault();
 
         const photo = photoInput.files[0];
-        const requiredInputs =
-            registrationForm.querySelectorAll("input[required]");
+        const requiredInputs = registrationForm.querySelectorAll("input[required]");
         let allFilled = true;
 
         requiredInputs.forEach((input) => {
@@ -161,47 +124,27 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         if (!allFilled) {
-            displayMessage(
-                "Please fill all the fields before proceeding.",
-                "error",
-                messageContainer,
-            );
+            displayMessage("Please fill all the fields before proceeding.", "error", messageContainer);
             return;
         }
 
         if (photo) {
             const validTypes = ["image/jpeg", "image/png"];
             if (!validTypes.includes(photo.type)) {
-                displayMessage(
-                    "Photo must be in .jpg, .jpeg, or .png format",
-                    "error",
-                    photoInput.parentElement,
-                );
+                displayMessage("Photo must be in .jpg, .jpeg, or .png format", "error", photoInput.parentElement);
                 return;
             }
             if (photo.size > 500 * 1024) {
-                displayMessage(
-                    "Photo must not exceed 500KB",
-                    "error",
-                    photoInput.parentElement,
-                );
+                displayMessage("Photo must not exceed 500KB", "error", photoInput.parentElement);
                 return;
             }
         } else {
-            displayMessage(
-                "Please upload a photo",
-                "error",
-                photoInput.parentElement,
-            );
+            displayMessage("Please upload a photo", "error", photoInput.parentElement);
             return;
         }
 
         if (!emailVerified) {
-            displayMessage(
-                "Error: Verify your email first!",
-                "error",
-                messageContainer,
-            );
+            displayMessage("Error: Verify your email first!", "error", messageContainer);
             return;
         }
 
@@ -220,11 +163,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             })
             .catch((error) => {
-                displayMessage(
-                    "Error registering. Please try again.",
-                    "error",
-                    messageContainer,
-                );
+                displayMessage("Error registering. Please try again.", "error", messageContainer);
                 console.error("Error:", error);
             });
     });
