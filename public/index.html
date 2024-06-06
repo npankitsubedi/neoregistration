@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Form</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <div class="form-container">
+        <div class="form-heading">
+            <img src="econlogo.png" alt="EconLogo">
+            <h1>Nepal Economics Olympiad - 2025</h1>
+            <h1>Registration Form</h1>
+        </div>
+        <div class="message-container"></div>
+        <form id="registrationForm" enctype="multipart/form-data" method="post" action="/register">
+            <div id="step1">
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" name="name" placeholder="Name" required>
+                </div>
+                <div class="form-group">
+                    <label for="contactNumber">Contact Number</label>
+                    <input type="tel" id="contactNumber" name="contactNumber" placeholder="Contact Number" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <div class="email-group">
+                        <input type="email" id="email" name="email" placeholder="Email Address" required>
+                        <button type="button" id="sendOtpButton">Send OTP</button>
+                    </div>
+                    <div class="send-otp-message"></div>
+                </div>
+                <div class="form-group otp-section" style="display: none;">
+                    <label for="otp">Enter OTP</label>
+                    <input type="text" id="otp" name="otp" placeholder="Enter OTP" required>
+                    <button type="button" id="verifyOtpButton">Verify OTP</button>
+                    <div class="verify-otp-message"></div>
+                    <div id="resendOtpTimer" style="display: none;">Resend OTP in <span id="timer"></span> seconds</div>
+                </div>
+            </div>
+            <div id="step2" style="display: none;">
+                <div class="form-group">
+                    <label for="gender">Gender</label>
+                    <select id="gender" name="gender" required>
+                        <option value="" disabled selected>Select your gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="class">Class</label>
+                    <select id="class" name="class" required>
+                        <option value="" disabled selected>Select your class</option>
+                        <option value="11">11 or AS Level</option>
+                        <option value="12">12 or A2 Level</option>
+                        <option value="other">Other</option>
+                        <option value="gapYear">Gap Year</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="district">District</label>
+                    <input type="text" id="district" name="district" placeholder="District" required>
+                </div>
+                <div class="form-group">
+                    <label for="province">Province</label>
+                    <select id="province" name="province" required>
+                        <option value="" disabled selected>Select your province</option>
+                        <option value="Province 1">Koshi</option>
+                        <option value="Province 2">Madesh</option>
+                        <option value="Bagmati">Bagmati</option>
+                        <option value="Gandaki">Gandaki</option>
+                        <option value="Lumbini">Lumbini</option>
+                        <option value="Karnali">Karnali</option>
+                        <option value="Sudurpashchim">Sudurpashchim</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="address">Address</label>
+                    <input type="text" id="address" name="address" placeholder="Address" required>
+                </div>
+                <div class="form-group">
+                    <label for="date">Date of Birth (in AD)</label>
+                    <input type="date" id="date" name="date" required>
+                </div>
+                <div class="form-group">
+                    <label for="schoolName">School Name</label>
+                    <input type="text" id="schoolName" name="schoolName" placeholder="School Name" required>
+                </div>
+                <div class="form-group">
+                    <label for="schoolAddress">School Address</label>
+                    <input type="text" id="schoolAddress" name="schoolAddress" placeholder="School Address" required>
+                </div>
+                <div class="form-group">
+                    <label for="nearestExamCenter">Nearest Exam Center</label>
+                    <select id="nearestExamCenter" name="nearestExamCenter" required>
+                        <option value="" disabled selected>Nearest Exam Center</option>
+                        <option value="Kathmandu">Kathmandu</option>
+                        <option value="Pokhara">Pokhara</option>
+                        <option value="Birgunj">Birgunj</option>
+                        <option value="Janakpur">Janakpur</option>
+                        <option value="Itahari">Itahari</option>
+                        <option value="Chitwan">Chitwan</option>
+                        <option value="Surkhet">Surkhet</option>
+                        <option value="Butwal">Butwal</option>
+                        <option value="Mahendranagar">Mahendranagar</option>
+                        <option value="Dhangadi">Dhangadi</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="parentsName">Parents Name</label>
+                    <input type="text" id="parentsName" name="parentsName" placeholder="Parents Name" required>
+                </div>
+                <div class="form-group">
+                    <label for="parentsContactNumber">Parents Contact Number</label>
+                    <input type="tel" id="parentsContactNumber" name="parentsContactNumber" placeholder="Parents Contact Number" required>
+                </div>
+                <div class="form-group">
+                    <label for="principalName">Principal/Coordinator Name</label>
+                    <input type="text" id="principalName" name="principalName" placeholder="Principal/Coordinator Name" required>
+                </div>
+                <div class="form-group">
+                    <label for="principalContactNumber">Principal/Coordinator Number</label>
+                    <input type="tel" id="principalContactNumber" name="principalContactNumber" placeholder="Principal/Coordinator Number" required>
+                </div>
+                <div class="form-group">
+                    <label for="source">How did you hear about us?</label>
+                    <select id="source" name="source" required>
+                        <option value="" disabled selected>Select an option</option>
+                        <option value="School/College">School/College</option>
+                        <option value="Facebook">Facebook</option>
+                        <option value="Instagram">Instagram</option>
+                        <option value="Google Search">Google Search</option>
+                        <option value="Others">Others</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="photo">Photo</label>
+                    <input type="file" id="photo" name="photo" accept="image/*" required>
+                    <small>Photo should not exceed 500KB and must be of type jpg, jpeg or png!</small>
+                </div>
+                <button type="submit" id="registerButton" disabled>Register</button>
+            </div>
+        </form>
+        <div id="thankYouMessage" style="display: none;">
+            <h2>Thank you for filling out the form.</h2>
+            <p>Please check your email for the Admit Card. If you don't receive it, kindly check the SPAM or Promotions folder.</p>
+            <p>For any queries, please do not hesitate to reach out to us at <a href="mailto:hi@ecolympnepal.org">hi@ecolympnepal.org</a>.</p>
+        </div>
+    </div>
+</body>
+</html>
