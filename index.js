@@ -198,12 +198,12 @@ async function generateAdmitCard(details, imageBuffer, imageMimeType) {
     const { width, height } = firstPage.getSize();
 
     const positions = {
-        symbolNumber: { x: 64 / 25.4 * 72, y: height - (84 / 25.4 * 72) },
-        name: { x: 64 / 25.4 * 72, y: height - (94 / 25.4 * 72) },
-        contactNumber: { x: 64 / 25.4 * 72, y: height - (104 / 25.4 * 72) },
-        date: { x: 64 / 25.4 * 72, y: height - (114 / 25.4 * 72) },
-        schoolName: { x: 64 / 25.4 * 72, y: height - (124 / 25.4 * 72) },
-        nearestExamCenter: { x: 64 / 25.4 * 72, y: height - (134 / 25.4 * 72) },
+        symbolNumber: { x: 64, y: height - 138 },
+        name: { x: 64, y: height - 158 },
+        contactNumber: { x: 64, y: height - 178 },
+        date: { x: 64, y: height - 198 },
+        schoolName: { x: 64, y: height - 218 },
+        nearestExamCenter: { x: 64, y: height - 238 },
     };
 
     firstPage.drawText(symbolNumber, { x: positions.symbolNumber.x, y: positions.symbolNumber.y, size: 12, color: rgb(0, 0, 0) });
@@ -222,18 +222,34 @@ async function generateAdmitCard(details, imageBuffer, imageMimeType) {
         throw new Error('Unsupported image format');
     }
 
-    const imageDims = image.scale(0.25);
+    const imageDims = image.scale(1);
+    const imageWidth = imageDims.width;
+    const imageHeight = imageDims.height;
+    
+    const maxWidth = 182;
+    const maxHeight = 122;
+
+    let newWidth = imageWidth;
+    let newHeight = imageHeight;
+    if (newWidth > maxWidth || newHeight > maxHeight) {
+        const widthRatio = maxWidth / newWidth;
+        const heightRatio = maxHeight / newHeight;
+        const scaleRatio = Math.min(widthRatio, heightRatio);
+        newWidth = newWidth * scaleRatio;
+        newHeight = newHeight * scaleRatio;
+    }
 
     firstPage.drawImage(image, {
-        x: 141 / 25.4 * 72,
-        y: height - (84 / 25.4 * 72 + imageDims.height),
-        width: Math.min(imageDims.width, 182 / 25.4 * 72),
-        height: Math.min(imageDims.height, 122 / 25.4 * 72),
+        x: width - 182,
+        y: height - 122,
+        width: newWidth,
+        height: newHeight,
     });
 
     const pdfBytes = await pdfDoc.save();
     return pdfBytes;
 }
+
 
 const server = app.listen(3000, () => {
     console.log('Server is running on port 3000');
