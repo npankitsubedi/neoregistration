@@ -54,7 +54,6 @@ app.post('/send-otp', (req, res) => {
     const { email, name } = req.body;
     const otp = crypto.randomInt(1000, 9999).toString();
     otpStore[email] = otp;
-
     setTimeout(() => {
         delete otpStore[email];
     }, 300000);
@@ -110,6 +109,7 @@ app.post('/register', upload, async (req, res) => {
         } = req.body;
 
         const photo = req.file.buffer;
+        const photoMimeType = req.file.mimetype;
 
         const symbolNumber = await assignSymbolNumber(nearestExamCenter);
 
@@ -129,7 +129,7 @@ app.post('/register', upload, async (req, res) => {
 
         const admitCardBuffer = await generateAdmitCard({
             symbolNumber, name, contactNumber, date, schoolName, nearestExamCenter
-        });
+        }, photo, photoMimeType);
 
         fs.readFile(path.join(__dirname, 'admitcard.html'), 'utf8', (err, data) => {
             if (err) {
@@ -177,13 +177,9 @@ async function assignSymbolNumber(nearestExamCenter) {
     try {
         const [rows] = await db.query('SELECT last_assigned_number FROM exam_center_numbers WHERE center_name = ? FOR UPDATE', [nearestExamCenter]);
         let lastAssignedNumber = rows[0].last_assigned_number;
-
         lastAssignedNumber++;
-
         await db.query('UPDATE exam_center_numbers SET last_assigned_number = ? WHERE center_name = ?', [lastAssignedNumber, nearestExamCenter]);
-
         const symbolNumber = `25NEO${String(lastAssignedNumber).padStart(5, '0')}`;
-
         return symbolNumber;
     } catch (error) {
         console.error('Error assigning symbol number:', error);
@@ -191,7 +187,7 @@ async function assignSymbolNumber(nearestExamCenter) {
     }
 }
 
-async function generateAdmitCard(details) {
+async function generateAdmitCard(details, imageBuffer, imageMimeType) {
     const { symbolNumber, name, contactNumber, date, schoolName, nearestExamCenter } = details;
 
     const existingPdfBytes = fs.readFileSync(path.join(__dirname, 'neo2025_admitcard.pdf'));
@@ -201,7 +197,6 @@ async function generateAdmitCard(details) {
     const firstPage = pages[0];
     const { width, height } = firstPage.getSize();
 
-    // Define text positions
     const positions = {
         symbolNumber: { x: 150, y: height - 180 },
         name: { x: 150, y: height - 200 },
@@ -218,14 +213,19 @@ async function generateAdmitCard(details) {
     firstPage.drawText(schoolName, { x: positions.schoolName.x, y: positions.schoolName.y, size: 12, color: rgb(0, 0, 0) });
     firstPage.drawText(nearestExamCenter, { x: positions.nearestExamCenter.x, y: positions.nearestExamCenter.y, size: 12, color: rgb(0, 0, 0) });
 
-    // Embed and draw the image on the PDF
-    const imageBytes = fs.readFileSync(path.join(__dirname, 'path-to-your-image-file.png')); // Update with actual path
-    const image = await pdfDoc.embedPng(imageBytes);
-    const imageDims = image.scale(0.25); // Scale image to fit on the PDF
+    let image;
+    if (imageMimeType === 'image/jpeg' || imageMimeType === 'image/jpg') {
+        image = await pdfDoc.embedJpg(imageBuffer);
+    } else if (imageMimeType === 'image/png') {
+        image = await pdfDoc.embedPng(imageBuffer);
+    } else {
+        throw new Error('Unsupported image format');
+    }
+    const imageDims = image.scale(0.25);
 
     firstPage.drawImage(image, {
-        x: width - 200, // Adjust X position
-        y: height - 400, // Adjust Y position
+        x: width - 200,
+        y: height - 400,
         width: imageDims.width,
         height: imageDims.height,
     });
@@ -233,7 +233,6 @@ async function generateAdmitCard(details) {
     const pdfBytes = await pdfDoc.save();
     return pdfBytes;
 }
-
 const server = app.listen(3000, () => {
     console.log('Server is running on port 3000');
 });
