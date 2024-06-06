@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Helvetica, Arial, sans-serif;
+            background-color: #031849;
+            margin: 0;
+            padding: 0;
+            color: #fff;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 40px;
+            background-color: #fff;
+            color: #031849;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        .header, .footer {
+            background-color: #031849;
+            color: white;
+            text-align: center;
+            padding: 10px;
+        }
+        .content {
+            padding: 20px;
+        }
+        .otp {
+            font-size: 20px;
+            font-weight: bold;
+            color: #031849;
+        }
+        .logo {
+            max-width: 150px;
+            display: block;
+            margin: 0 auto 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <img src="cid:logo" alt="Nepal Economics Olympiad 2025" class="logo">
+        </div>
+        <div class="content">
+            <p>Dear {Name},</p>
+            <p>Please use this OTP to verify your email. The OTP will expire in 5 minutes. Do not share this with anyone! </p>
+            <p class="otp">OTP: {OTP}</p>
+            <p>Best wishes,</p>
+            <p>Regards,</p>
+            <p>Steering Committee</p>
+            <p>Nepal Economics Olympiad</p>
+        </div>
+        <div class="footer">
+            &copy; Nepal Economics Olympiad 2025
+        </div>
+    </div>
+</body>
+</html>
