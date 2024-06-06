@@ -201,12 +201,34 @@ async function generateAdmitCard(details) {
     const firstPage = pages[0];
     const { width, height } = firstPage.getSize();
 
-    firstPage.drawText(symbolNumber, { x: 150, y: height - 200, size: 12, color: rgb(0, 0, 0) });
-    firstPage.drawText(name, { x: 150, y: height - 220, size: 12, color: rgb(0, 0, 0) });
-    firstPage.drawText(contactNumber, { x: 150, y: height - 240, size: 12, color: rgb(0, 0, 0) });
-    firstPage.drawText(date, { x: 150, y: height - 260, size: 12, color: rgb(0, 0, 0) });
-    firstPage.drawText(schoolName, { x: 150, y: height - 280, size: 12, color: rgb(0, 0, 0) });
-    firstPage.drawText(nearestExamCenter, { x: 150, y: height - 300, size: 12, color: rgb(0, 0, 0) });
+    // Define text positions
+    const positions = {
+        symbolNumber: { x: 150, y: height - 180 },
+        name: { x: 150, y: height - 200 },
+        contactNumber: { x: 150, y: height - 220 },
+        date: { x: 150, y: height - 240 },
+        schoolName: { x: 150, y: height - 260 },
+        nearestExamCenter: { x: 150, y: height - 280 },
+    };
+
+    firstPage.drawText(symbolNumber, { x: positions.symbolNumber.x, y: positions.symbolNumber.y, size: 12, color: rgb(0, 0, 0) });
+    firstPage.drawText(name, { x: positions.name.x, y: positions.name.y, size: 12, color: rgb(0, 0, 0) });
+    firstPage.drawText(contactNumber, { x: positions.contactNumber.x, y: positions.contactNumber.y, size: 12, color: rgb(0, 0, 0) });
+    firstPage.drawText(date, { x: positions.date.x, y: positions.date.y, size: 12, color: rgb(0, 0, 0) });
+    firstPage.drawText(schoolName, { x: positions.schoolName.x, y: positions.schoolName.y, size: 12, color: rgb(0, 0, 0) });
+    firstPage.drawText(nearestExamCenter, { x: positions.nearestExamCenter.x, y: positions.nearestExamCenter.y, size: 12, color: rgb(0, 0, 0) });
+
+    // Embed and draw the image on the PDF
+    const imageBytes = fs.readFileSync(path.join(__dirname, 'path-to-your-image-file.png')); // Update with actual path
+    const image = await pdfDoc.embedPng(imageBytes);
+    const imageDims = image.scale(0.25); // Scale image to fit on the PDF
+
+    firstPage.drawImage(image, {
+        x: width - 200, // Adjust X position
+        y: height - 400, // Adjust Y position
+        width: imageDims.width,
+        height: imageDims.height,
+    });
 
     const pdfBytes = await pdfDoc.save();
     return pdfBytes;
