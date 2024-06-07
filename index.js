@@ -49,7 +49,14 @@ const upload = multer({
 app.post('/send-otp', async (req, res) => {
     const { email, name } = req.body;
     const otp = crypto.randomInt(1000, 9999).toString();
-    otpStore[email] = otp;
+    const timestamp = Date.now();
+
+    // Check if OTP was sent within the last minute
+    if (otpStore[email] && (timestamp - otpStore[email].timestamp < 60000)) {
+        return res.status(429).send('Please wait a minute before requesting a new OTP.');
+    }
+
+    otpStore[email] = { otp, timestamp };
     setTimeout(() => delete otpStore[email], 300000);
 
     try {
@@ -76,7 +83,7 @@ app.post('/send-otp', async (req, res) => {
 
 app.post('/verify-otp', (req, res) => {
     const { email, otp } = req.body;
-    if (otpStore[email] === otp) {
+    if (otpStore[email] && otpStore[email].otp === otp) {
         delete otpStore[email];
         res.send('OTP verified');
     } else {
