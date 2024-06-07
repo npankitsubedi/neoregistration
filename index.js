@@ -223,7 +223,7 @@ async function generateAdmitCard(details, imageBuffer, imageMimeType) {
     }
 
     const imageDims = image.scale(0.25);
-    const moveUpPoints = 8 / 25.4 * 72; 
+    const moveUpPoints = 6 / 25.4 * 72; 
 
     firstPage.drawImage(image, {
         x: 141 / 25.4 * 72,
