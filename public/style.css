@@ -89,6 +89,12 @@ button:hover {
   background-color: #1b2957;
 }
 
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
 #verifyOtpButton {
   background-color: #031849;
   color: white;
@@ -134,7 +140,8 @@ small {
     max-width: 60px;
   }
 
-  button, .email-group button {
+  button,
+  .email-group button {
     padding: 10px;
   }
 }
@@ -161,8 +168,12 @@ small {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .photo-error {
