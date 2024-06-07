@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 const crypto = require('crypto');
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs');
+const fs = require('fs').promises;
 const mysql = require('mysql2/promise');
 const { PDFDocument, rgb } = require('pdf-lib');
 require('dotenv').config();
@@ -36,37 +36,27 @@ const transporter = nodemailer.createTransport({
 
 const storage = multer.memoryStorage();
 const upload = multer({
-    storage: storage,
+    storage,
     limits: { fileSize: 500 * 1024 },
     fileFilter: (req, file, cb) => {
         const filetypes = /jpeg|jpg|png/;
         const mimetype = filetypes.test(file.mimetype);
         const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-        if (mimetype && extname) {
-            return cb(null, true);
-        } else {
-            cb(new Error('File type not supported'));
-        }
+        mimetype && extname ? cb(null, true) : cb(new Error('File type not supported'));
     }
 }).single('photo');
 
-app.post('/send-otp', (req, res) => {
+app.post('/send-otp', async (req, res) => {
     const { email, name } = req.body;
     const otp = crypto.randomInt(1000, 9999).toString();
     otpStore[email] = otp;
-    setTimeout(() => {
-        delete otpStore[email];
-    }, 300000);
+    setTimeout(() => delete otpStore[email], 300000);
 
-    fs.readFile(path.join(__dirname, 'otp-email.html'), 'utf8', (err, data) => {
-        if (err) {
-            console.error('Error reading HTML file:', err);
-            return res.status(500).send('Error generating email');
-        }
-
+    try {
+        const data = await fs.readFile(path.join(__dirname, 'otp-email.html'), 'utf8');
         const htmlContent = data.replace('{Name}', name).replace('{OTP}', otp);
 
-        const mailOptions = {
+        await transporter.sendMail({
             from: process.env.SMTP_USER,
             to: email,
             subject: 'Your OTP Code',
@@ -76,17 +66,12 @@ app.post('/send-otp', (req, res) => {
                 path: path.join(__dirname, 'public', 'econlogo.png'),
                 cid: 'logo'
             }]
-        };
-
-        transporter.sendMail(mailOptions, (error, info) => {
-            if (error) {
-                console.error('Error sending OTP:', error);
-                return res.status(500).send('Error sending OTP');
-            }
-            console.log('OTP sent:', info.response);
-            res.send('OTP sent');
         });
-    });
+        res.send('OTP sent');
+    } catch (error) {
+        console.error('Error sending OTP:', error);
+        res.status(500).send('Error sending OTP');
+    }
 });
 
 app.post('/verify-otp', (req, res) => {
@@ -131,44 +116,30 @@ app.post('/register', upload, async (req, res) => {
             symbolNumber, name, contactNumber, date, schoolName, nearestExamCenter
         }, photo, photoMimeType);
 
-        fs.readFile(path.join(__dirname, 'admitcard.html'), 'utf8', (err, data) => {
-            if (err) {
-                console.error('Error reading HTML file:', err);
-                return res.status(500).send('Error generating email');
-            }
+        const data = await fs.readFile(path.join(__dirname, 'admitcard.html'), 'utf8');
+        const emailHtml = data.replace('{Name}', name);
 
-            const emailHtml = data.replace('{Name}', name);
-
-            const mailOptions = {
-                from: process.env.SMTP_USER,
-                to: email,
-                subject: 'NEO 2025 Registration Successful - Admit Card Attached',
-                html: emailHtml,
-                attachments: [
-                    {
-                        filename: 'admit_card.pdf',
-                        content: admitCardBuffer,
-                        contentType: 'application/pdf'
-                    },
-                    {
-                        filename: 'logo.png',
-                        path: path.join(__dirname, 'public', 'econlogo.png'),
-                        cid: 'logo'
-                    }
-                ]
-            };
-
-            transporter.sendMail(mailOptions, (error, info) => {
-                if (error) {
-                    console.error('Error sending registration email:', error);
-                    return res.status(500).send('Error sending registration email');
+        await transporter.sendMail({
+            from: process.env.SMTP_USER,
+            to: email,
+            subject: 'NEO 2025 Registration Successful - Admit Card Attached',
+            html: emailHtml,
+            attachments: [
+                {
+                    filename: 'admit_card.pdf',
+                    content: admitCardBuffer,
+                    contentType: 'application/pdf'
+                },
+                {
+                    filename: 'logo.png',
+                    path: path.join(__dirname, 'public', 'econlogo.png'),
+                    cid: 'logo'
                 }
-                console.log('Registration email sent:', info.response);
-                res.send('Registration successful');
-            });
+            ]
         });
+        res.send('Registration successful');
     } catch (err) {
-        console.error('Error inserting registration:', err);
+        console.error('Error registering:', err);
         res.status(500).send('Error registering');
     }
 });
@@ -179,8 +150,7 @@ async function assignSymbolNumber(nearestExamCenter) {
         let lastAssignedNumber = rows[0].last_assigned_number;
         lastAssignedNumber++;
         await db.query('UPDATE exam_center_numbers SET last_assigned_number = ? WHERE center_name = ?', [lastAssignedNumber, nearestExamCenter]);
-        const symbolNumber = `25NEO${String(lastAssignedNumber).padStart(5, '0')}`;
-        return symbolNumber;
+        return `25NEO${String(lastAssignedNumber).padStart(5, '0')}`;
     } catch (error) {
         console.error('Error assigning symbol number:', error);
         throw error;
@@ -189,13 +159,11 @@ async function assignSymbolNumber(nearestExamCenter) {
 
 async function generateAdmitCard(details, imageBuffer, imageMimeType) {
     const { symbolNumber, name, contactNumber, date, schoolName, nearestExamCenter } = details;
-
-    const existingPdfBytes = fs.readFileSync(path.join(__dirname, 'neo2025_admitcard.pdf'));
+    const existingPdfBytes = await fs.readFile(path.join(__dirname, 'neo2025_admitcard.pdf'));
 
     const pdfDoc = await PDFDocument.load(existingPdfBytes);
-    const pages = pdfDoc.getPages();
-    const firstPage = pages[0];
-    const { width, height } = firstPage.getSize();
+    const [firstPage] = pdfDoc.getPages();
+    const { height } = firstPage.getSize();
 
     const positions = {
         symbolNumber: { x: 64 / 25.4 * 72, y: height - (84 / 25.4 * 72) },
@@ -206,37 +174,24 @@ async function generateAdmitCard(details, imageBuffer, imageMimeType) {
         nearestExamCenter: { x: 64 / 25.4 * 72, y: height - (134 / 25.4 * 72) },
     };
 
-    firstPage.drawText(symbolNumber, { x: positions.symbolNumber.x, y: positions.symbolNumber.y, size: 12, color: rgb(0, 0, 0) });
-    firstPage.drawText(name, { x: positions.name.x, y: positions.name.y, size: 12, color: rgb(0, 0, 0) });
-    firstPage.drawText(contactNumber, { x: positions.contactNumber.x, y: positions.contactNumber.y, size: 12, color: rgb(0, 0, 0) });
-    firstPage.drawText(date, { x: positions.date.x, y: positions.date.y, size: 12, color: rgb(0, 0, 0) });
-    firstPage.drawText(schoolName, { x: positions.schoolName.x, y: positions.schoolName.y, size: 12, color: rgb(0, 0, 0) });
-    firstPage.drawText(nearestExamCenter, { x: positions.nearestExamCenter.x, y: positions.nearestExamCenter.y, size: 12, color: rgb(0, 0, 0) });
+    Object.entries(positions).forEach(([key, pos]) => {
+        firstPage.drawText(details[key], { x: pos.x, y: pos.y, size: 12, color: rgb(0, 0, 0) });
+    });
 
-    let image;
-    if (imageMimeType === 'image/jpeg' || imageMimeType === 'image/jpg') {
-        image = await pdfDoc.embedJpg(imageBuffer);
-    } else if (imageMimeType === 'image/png') {
-        image = await pdfDoc.embedPng(imageBuffer);
-    } else {
-        throw new Error('Unsupported image format');
-    }
-
+    const image = imageMimeType.includes('jpeg') ? await pdfDoc.embedJpg(imageBuffer) : await pdfDoc.embedPng(imageBuffer);
     const imageDims = image.scale(0.25);
-    const moveUpPoints = 6 / 25.4 * 72; 
+    const moveUpPoints = 6 / 25.4 * 72;
 
     firstPage.drawImage(image, {
         x: 141 / 25.4 * 72,
-        y: height - (84 / 25.4 * 72 + imageDims.height) + moveUpPoints, 
-    width: Math.min(imageDims.width, 182 / 25.4 * 72),
-    height: Math.min(imageDims.height, 122 / 25.4 * 72),
-});
+        y: height - (84 / 25.4 * 72 + imageDims.height) + moveUpPoints,
+        width: Math.min(imageDims.width, 182 / 25.4 * 72),
+        height: Math.min(imageDims.height, 122 / 25.4 * 72),
+    });
 
-
-    const pdfBytes = await pdfDoc.save();
-    return pdfBytes;
+    return await pdfDoc.save();
 }
 
-const server = app.listen(3000, () => {
+app.listen(3000, () => {
     console.log('Server is running on port 3000');
 });
