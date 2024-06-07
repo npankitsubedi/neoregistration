@@ -7,7 +7,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const otpInput = document.getElementById("otp");
     const otpSection = document.querySelector(".otp-section");
     const photoInput = document.getElementById("photo");
-    const photoPreview = document.getElementById("photoPreview");
     const registrationForm = document.getElementById("registrationForm");
     const step1 = document.getElementById("step1");
     const step2 = document.getElementById("step2");
@@ -20,13 +19,8 @@ document.addEventListener("DOMContentLoaded", () => {
     let emailVerified = false;
     let timer;
 
-    const displayMessage = (message, type, element) => {
-        const messageElement = document.createElement("p");
-        messageElement.textContent = message;
-        messageElement.style.color = type === "error" ? "red" : "green";
-        messageElement.style.fontWeight = "bold";
-        element.innerHTML = "";
-        element.appendChild(messageElement);
+    const displayMessage = (message, type, container) => {
+        container.innerHTML = `<p style="color: ${type === 'error' ? 'red' : 'green'}; font-weight: bold;">${message}</p>`;
     };
 
     const startTimer = (duration) => {
@@ -46,7 +40,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const disableSendOtpButton = () => {
         sendOtpButton.disabled = true;
-        startTimer(300);
+        startTimer(60);
+    };
+
+    const showLoading = () => {
+        loadingElement.style.display = "block";
+        setTimeout(() => {
+            loadingElement.style.display = "none";
+        }, 5000);
     };
 
     sendOtpButton.addEventListener("click", () => {
@@ -103,7 +104,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         otpSection.style.display = "none";
                         step1.style.display = "none";
                         step2.style.display = "block";
-                        registerButton.disabled = false; // Enable the register button
+                        registerButton.disabled = false;
                     } else {
                         displayMessage("Invalid OTP. Please try again.", "error", verifyOtpMessageContainer);
                     }
@@ -126,25 +127,15 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!validTypes.includes(photo.type)) {
                 displayMessage("Photo must be in .jpg, .jpeg, or .png format", "error", photoError);
                 photoError.style.display = "block";
-                photoPreview.style.display = "none";
                 return;
             }
             if (photo.size > 500 * 1024) {
                 displayMessage("Photo must not exceed 500KB", "error", photoError);
                 photoError.style.display = "block";
-                photoPreview.style.display = "none";
                 return;
             }
 
             photoError.style.display = "none";
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                photoPreview.src = e.target.result;
-                photoPreview.style.display = "block";
-            };
-            reader.readAsDataURL(photo);
-        } else {
-            photoPreview.style.display = "none";
         }
     });
 
@@ -187,7 +178,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const formData = new FormData(registrationForm);
-        loadingElement.style.display = "block";
+        showLoading();
 
         fetch("/register", {
             method: "POST",
@@ -209,7 +200,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 console.error("Error:", error);
             });
 
-        // Disable the register button to prevent multiple clicks
         registerButton.disabled = true;
     });
 });
