@@ -6,7 +6,7 @@
     <link href="econlogo.png" rel="icon" type="image/png" />
     <title>Registration Form</title>
     <link href="style.css" rel="stylesheet" />
-    <script src="script.js" defer></script>
+    <script defer src="script.js"></script>
 </head>
 <body>
 <div class="form-container">
@@ -162,7 +162,8 @@
                 <label for="photo">Photo</label>
                 <input accept="image/*" id="photo" name="photo" required="" type="file" />
                 <small>Photo should not exceed 500KB and must be of type jpg, jpeg or png!</small>
-                <div class="photo-error" style="color: red; display: none;">Photo must not exceed 500KB and must be in .jpg, .jpeg, or .png format.</div>
+                <div class="photo-error" style="color: red; display: none;"></div>
+                <div class="photo-message" style="color: green; display: none;"></div>
             </div>
 
             <button id="registerButton" type="submit" disabled>Register</button>
@@ -174,11 +175,11 @@
         <p>Please check your email for the Admit Card. If you don't receive it, kindly check the SPAM or Promotions folder.</p>
         <p>For any queries, please do not hesitate to reach out to us at <a href="mailto:hi@ecolympnepal.org">hi@ecolympnepal.org</a>.</p>
     </div>
-</div>
-
-<div id="loading" style="display: none;">
-    <div class="loading-spinner"></div>
-    <p>Loading, please wait...</p>
-</div>
+    <div id="loading" class="loading-overlay" style="display: none;">
+      <div class="loading-spinner">
+        <img src="econlogo.png" alt="Loading...">
+      </div>
+      <p>Loading, please wait...</p>
+    </div>
 </body>
 </html>
