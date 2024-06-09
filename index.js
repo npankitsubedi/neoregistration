@@ -7,6 +7,7 @@ const path = require('path');
 const fs = require('fs').promises;
 const mysql = require('mysql2/promise');
 const { PDFDocument, rgb } = require('pdf-lib');
+const sharp = require('sharp');
 require('dotenv').config();
 
 const app = express();
@@ -51,7 +52,6 @@ app.post('/send-otp', async (req, res) => {
     const otp = crypto.randomInt(1000, 9999).toString();
     const timestamp = Date.now();
 
-    // Check if OTP was sent within the last minute
     if (otpStore[email] && (timestamp - otpStore[email].timestamp < 60000)) {
         return res.status(429).send('Please wait a minute before requesting a new OTP.');
     }
@@ -74,10 +74,11 @@ app.post('/send-otp', async (req, res) => {
                 cid: 'logo'
             }]
         });
-        res.send('OTP sent');
+        console.log('OTP sent successfully to:', email);
+        return res.status(200).send('OTP sent');  // Ensure status is set to 200
     } catch (error) {
         console.error('Error sending OTP:', error);
-        res.status(500).send('Error sending OTP');
+        return res.status(500).send('Error sending OTP');
     }
 });
 
@@ -85,9 +86,11 @@ app.post('/verify-otp', (req, res) => {
     const { email, otp } = req.body;
     if (otpStore[email] && otpStore[email].otp === otp) {
         delete otpStore[email];
-        res.send('OTP verified');
+        console.log('OTP verified successfully for:', email);
+        return res.status(200).send('OTP verified');  // Ensure status is set to 200
     } else {
-        res.status(400).send('Invalid or expired OTP');
+        console.log('Invalid or expired OTP for:', email);
+        return res.status(400).send('Invalid or expired OTP');
     }
 });
 
@@ -103,6 +106,11 @@ app.post('/register', upload, async (req, res) => {
         const photo = req.file.buffer;
         const photoMimeType = req.file.mimetype;
 
+        // Resize the photo to fixed dimensions (3x4 inches)
+        const resizedPhoto = await sharp(photo)
+            .resize({ width: 300, height: 400 })
+            .toBuffer();
+
         const symbolNumber = await assignSymbolNumber(nearestExamCenter);
 
         const sql = `INSERT INTO registrations (
@@ -115,13 +123,13 @@ app.post('/register', upload, async (req, res) => {
         await db.execute(sql, [
             name, contactNumber, email, gender, studentClass, district, province,
             address, date, schoolName, schoolAddress, nearestExamCenter, parentsName,
-            parentsContactNumber, principalName, principalContactNumber, source, photo,
+            parentsContactNumber, principalName, principalContactNumber, source, resizedPhoto,
             symbolNumber
         ]);
 
         const admitCardBuffer = await generateAdmitCard({
             symbolNumber, name, contactNumber, date, schoolName, nearestExamCenter
-        }, photo, photoMimeType);
+        }, resizedPhoto, photoMimeType);
 
         const data = await fs.readFile(path.join(__dirname, 'admitcard.html'), 'utf8');
         const emailHtml = data.replace('{Name}', name);
@@ -144,10 +152,11 @@ app.post('/register', upload, async (req, res) => {
                 }
             ]
         });
-        res.send('Registration successful');
+        console.log('Registration successful for:', email);
+        return res.status(200).send('Registration successful');  // Ensure status is set to 200
     } catch (err) {
         console.error('Error registering:', err);
-        res.status(500).send('Error registering');
+        return res.status(500).send('Error registering');
     }
 });
 
