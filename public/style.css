@@ -1,182 +1,214 @@
 body {
-    font-family: Helvetica, Arial, sans-serif;
-    background-color: #031849;
-    margin: 0;
-    padding: 0;
-    color: #fff;
+  font-family: Helvetica, Arial, sans-serif;
+  background-color: #031849;
+  margin: 0;
+  padding: 0;
+  color: #fff;
+  position: relative;
 }
 
 .form-container {
-    width: 90%;
-    max-width: 600px;
-    margin: 50px auto;
-    padding: 20px;
-    background-color: #fff;
-    color: #031849;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
-    box-sizing: border-box;
+  width: 90%;
+  max-width: 600px;
+  margin: 50px auto;
+  padding: 20px;
+  background-color: #fff;
+  color: #031849;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  box-sizing: border-box;
 }
 
 .form-heading {
-    text-align: center;
-    margin-bottom: 30px;
-    color: #031849;
+  text-align: center;
+  margin-bottom: 30px;
+  color: #031849;
 }
 
 .form-heading img {
-    max-width: 80px;
-    margin-bottom: 15px;
+  max-width: 80px;
+  margin-bottom: 15px;
 }
 
 .form-group {
-    margin-bottom: 15px;
-    color: #031849;
+  margin-bottom: 15px;
+  color: #031849;
 }
 
 .form-group input,
 .form-group select,
 .form-group button {
-    width: 100%;
-    padding: 12px;
-    margin-top: 5px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    color: #031849;
-    box-sizing: border-box;
+  width: 100%;
+  padding: 12px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  color: #031849;
+  box-sizing: border-box;
 }
 
 .form-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-    color: #031849;
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #031849;
 }
 
 .email-group {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .email-group input {
-    flex: 1;
+  flex: 1;
 }
 
 .email-group button {
-    background-color: #031849;
-    color: white;
-    border: none;
-    cursor: pointer;
-    padding: 12px;
-    border-radius: 5px;
+  background-color: #031849;
+  color: white;
+  border: none;
+  cursor: pointer;
+  padding: 12px;
+  border-radius: 5px;
 }
 
 .email-group button:hover {
-    background-color: #1b2957;
+  background-color: #1b2957;
 }
 
 button {
-    background-color: #031849;
-    color: white;
-    border: none;
-    cursor: pointer;
-    padding: 15px;
-    border-radius: 10px;
+  background-color: #031849;
+  color: white;
+  border: none;
+  cursor: pointer;
+  padding: 15px;
+  border-radius: 10px;
 }
 
 button:hover {
-    background-color: #1b2957;
+  background-color: #1b2957;
 }
 
 button:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-    opacity: 0.6;
+  background-color: #ccc;
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 
 #verifyOtpButton {
-    background-color: #031849;
-    color: white;
-    border: none;
-    cursor: pointer;
-    padding: 12px;
-    border-radius: 5px;
+  background-color: #031849;
+  color: white;
+  border: none;
+  cursor: pointer;
+  padding: 12px;
+  border-radius: 5px;
 }
 
 #verifyOtpButton:hover {
-    background-color: #1b2957;
+  background-color: #1b2957;
 }
 
 small {
-    display: block;
-    margin-top: 5px;
-    font-size: 0.8em;
-    color: #555;
+  display: block;
+  margin-top: 5px;
+  font-size: 0.8em;
+  color: #555;
 }
 
 .otp-section {
-    display: none;
+  display: none;
 }
 
 @media (min-width: 600px) {
-    .form-container {
-        padding: 40px;
-        width: 70%;
-        margin: 50px auto;
-    }
+  .form-container {
+    padding: 40px;
+    width: 70%;
+    margin: 50px auto;
+  }
 
-    .email-group {
-        flex-direction: column;
-    }
+  .email-group {
+    flex-direction: column;
+  }
 }
 
 @media (max-width: 599px) {
-    .form-container {
-        padding: 20px;
-    }
+  .form-container {
+    padding: 20px;
+  }
 
-    .form-heading img {
-        max-width: 60px;
-    }
+  .form-heading img {
+    max-width: 60px;
+  }
 
-    button,
-    .email-group button {
-        padding: 10px;
-    }
+  button,
+  .email-group button {
+    padding: 10px;
+  }
 }
 
 .message-container {
-    padding: 10px;
-    margin-bottom: 20px;
-    text-align: center;
-    border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 20px;
+  text-align: center;
+  border-radius: 5px;
 }
 
 .message-container p {
-    margin: 0;
+  margin: 0;
+}
+
+.loading-overlay {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 1000;
+  flex-direction: column;
 }
 
 .loading-spinner {
-    border: 16px solid #f3f3f3;
-    border-top: 16px solid #031849;
-    border-radius: 50%;
-    width: 120px;
-    height: 120px;
-    animation: spin 2s linear infinite;
-    margin: 20px auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  width: 120px;
+  height: 120px;
+}
+
+.loading-spinner img {
+  position: absolute;
+  width: 60px; /* Adjust size as needed */
+  height: 60px;
+  z-index: 1; /* Ensure it stays on top */
+}
+
+.loading-spinner::before {
+  content: "";
+  box-sizing: border-box;
+  width: 120px;
+  height: 120px;
+  border: 16px solid #f3f3f3;
+  border-top: 16px solid #031849;
+  border-radius: 50%;
+  animation: spin 2s linear infinite;
 }
 
 @keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .photo-error {
-    color: red;
-    display: none;
+  color: red;
+  display: none;
 }
