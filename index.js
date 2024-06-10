@@ -16,7 +16,11 @@ const db = mysql.createPool({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PASS,
-    database: process.env.DB_NAME
+    database: process.env.DB_NAME,
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0,
+    connectTimeout: 60000 // 60 seconds
 });
 
 app.use(bodyParser.json());
@@ -75,7 +79,7 @@ app.post('/send-otp', async (req, res) => {
             }]
         });
         console.log('OTP sent successfully to:', email);
-        return res.status(200).send('OTP sent');  // Ensure status is set to 200
+        return res.status(200).send('OTP sent');
     } catch (error) {
         console.error('Error sending OTP:', error);
         return res.status(500).send('Error sending OTP');
@@ -87,7 +91,7 @@ app.post('/verify-otp', (req, res) => {
     if (otpStore[email] && otpStore[email].otp === otp) {
         delete otpStore[email];
         console.log('OTP verified successfully for:', email);
-        return res.status(200).send('OTP verified');  // Ensure status is set to 200
+        return res.status(200).send('OTP verified');
     } else {
         console.log('Invalid or expired OTP for:', email);
         return res.status(400).send('Invalid or expired OTP');
@@ -153,16 +157,17 @@ app.post('/register', upload, async (req, res) => {
             ]
         });
         console.log('Registration successful for:', email);
-        return res.status(200).send('Registration successful');  // Ensure status is set to 200
+        return res.status(200).send('Registration successful');
     } catch (err) {
         console.error('Error registering:', err);
         return res.status(500).send('Error registering');
     }
 });
 
+// Update the assignSymbolNumber function here
 async function assignSymbolNumber(nearestExamCenter) {
     try {
-        const [rows] = await db.query('SELECT last_assigned_number FROM exam_center_numbers WHERE center_name = ? FOR UPDATE', [nearestExamCenter]);
+        const [rows] = await db.query('SELECT last_assigned_number FROM exam_center_numbers WHERE center_name = ?', [nearestExamCenter]);
         let lastAssignedNumber = rows[0].last_assigned_number;
         lastAssignedNumber++;
         await db.query('UPDATE exam_center_numbers SET last_assigned_number = ? WHERE center_name = ?', [lastAssignedNumber, nearestExamCenter]);
