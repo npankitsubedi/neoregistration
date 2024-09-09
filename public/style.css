@@ -19,6 +19,12 @@ body {
   box-sizing: border-box;
 }
 
+.main-options {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 20px;
+}
+
 .form-heading {
   text-align: center;
   margin-bottom: 30px;
@@ -28,6 +34,10 @@ body {
 .form-heading img {
   max-width: 80px;
   margin-bottom: 15px;
+}
+
+.form-heading h1, .form-heading h3 {
+  margin: 10px 0;
 }
 
 .form-group {
@@ -96,7 +106,7 @@ button:disabled {
   opacity: 0.6;
 }
 
-#verifyOtpButton {
+#verifyOtpButton, #verifyStatusOtpButton {
   background-color: #031849;
   color: white;
   border: none;
@@ -105,7 +115,7 @@ button:disabled {
   border-radius: 5px;
 }
 
-#verifyOtpButton:hover {
+#verifyOtpButton:hover, #verifyStatusOtpButton:hover {
   background-color: #1b2957;
 }
 
@@ -116,8 +126,9 @@ small {
   color: #555;
 }
 
-.otp-section {
+.otp-section, .otp-section-status {
   display: none;
+  margin-top: 20px;
 }
 
 @media (min-width: 600px) {
@@ -183,9 +194,9 @@ small {
 
 .loading-spinner img {
   position: absolute;
-  width: 60px; /* Adjust size as needed */
+  width: 60px;
   height: 60px;
-  z-index: 1; /* Ensure it stays on top */
+  z-index: 1;
 }
 
 .loading-spinner::before {
@@ -211,4 +222,18 @@ small {
 .photo-error {
   color: red;
   display: none;
+}
+
+/* New styles for status check */
+.send-status-otp-message {
+  margin-top: 10px;
+}
+
+#statusForm {
+  margin-top: 20px;
+}
+
+.status-details-container p {
+  text-align: left;
+  margin: 5px 0;
 }
