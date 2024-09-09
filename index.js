@@ -17,6 +17,7 @@ const db = mysql.createPool({
     user: process.env.DB_USER,
     password: process.env.DB_PASS,
     database: process.env.DB_NAME,
+    port: process.env.DB_PORT,
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
@@ -51,6 +52,12 @@ const upload = multer({
     }
 }).single('photo');
 
+const logActivity = async (message) => {
+    const timestamp = new Date().toISOString();
+    const logMessage = `[${timestamp}] ${message}\n`;
+    await fs.appendFile(path.join(__dirname, 'activity.log'), logMessage);
+};
+
 app.post('/send-otp', async (req, res) => {
     const { email, name } = req.body;
     const otp = crypto.randomInt(1000, 9999).toString();
@@ -78,6 +85,7 @@ app.post('/send-otp', async (req, res) => {
                 cid: 'logo'
             }]
         });
+        await logActivity(`OTP sent to ${name} at ${email}`);
         console.log('OTP sent successfully to:', email);
         return res.status(200).send('OTP sent');
     } catch (error) {
@@ -86,13 +94,15 @@ app.post('/send-otp', async (req, res) => {
     }
 });
 
-app.post('/verify-otp', (req, res) => {
+app.post('/verify-otp', async (req, res) => {
     const { email, otp } = req.body;
     if (otpStore[email] && otpStore[email].otp === otp) {
         delete otpStore[email];
+        await logActivity(`OTP verified for ${email}`);
         console.log('OTP verified successfully for:', email);
         return res.status(200).send('OTP verified');
     } else {
+        await logActivity(`Invalid or expired OTP for ${email}`);
         console.log('Invalid or expired OTP for:', email);
         return res.status(400).send('Invalid or expired OTP');
     }
@@ -106,16 +116,29 @@ app.post('/register', upload, async (req, res) => {
             nearestExamCenter, parentsName, parentsContactNumber,
             principalName, principalContactNumber, source
         } = req.body;
+        const [rows] = await db.query('SELECT * FROM registrations WHERE name = ? AND email = ?', [name, email]);
+        if (rows.length > 0) {
+            await logActivity(`Duplicate registration attempt for ${name} with email ${email}`);
+            return res.status(400).send('Duplicate Registrations Not Allowed');
+        }
+
+        const symbolNumber = await assignSymbolNumber(nearestExamCenter);
+        await logActivity(`Symbol number ${symbolNumber} fetched for ${name} with email ${email}`);
 
         const photo = req.file.buffer;
         const photoMimeType = req.file.mimetype;
 
-        // Resize the photo to fixed dimensions (3x4 inches)
         const resizedPhoto = await sharp(photo)
-            .resize({ width: 300, height: 400 })
+            .resize({ width: 500, height: 500 })
             .toBuffer();
 
-        const symbolNumber = await assignSymbolNumber(nearestExamCenter);
+        const photoDir = path.join(__dirname, 'neo2025_regional');
+        await fs.mkdir(photoDir, { recursive: true });
+
+        const photoPath = path.join(photoDir, `${symbolNumber}.jpg`);
+        await fs.writeFile(photoPath, resizedPhoto);
+
+        const photoUrl = `/neo2025_regional/${symbolNumber}.jpg`;
 
         const sql = `INSERT INTO registrations (
             name, contactNumber, email, gender, class, district, province,
@@ -127,7 +150,7 @@ app.post('/register', upload, async (req, res) => {
         await db.execute(sql, [
             name, contactNumber, email, gender, studentClass, district, province,
             address, date, schoolName, schoolAddress, nearestExamCenter, parentsName,
-            parentsContactNumber, principalName, principalContactNumber, source, resizedPhoto,
+            parentsContactNumber, principalName, principalContactNumber, source, photoUrl,
             symbolNumber
         ]);
 
@@ -156,6 +179,7 @@ app.post('/register', upload, async (req, res) => {
                 }
             ]
         });
+        await logActivity(`Admit card generated and mailed for ${name} at ${email}`);
         console.log('Registration successful for:', email);
         return res.status(200).send('Registration successful');
     } catch (err) {
@@ -164,7 +188,73 @@ app.post('/register', upload, async (req, res) => {
     }
 });
 
-// Update the assignSymbolNumber function here
+app.post('/send-status-otp', async (req, res) => {
+    const { email, name } = req.body;
+    const otp = crypto.randomInt(1000, 9999).toString();
+    const timestamp = Date.now();
+
+    if (otpStore[email] && (timestamp - otpStore[email].timestamp < 60000)) {
+        return res.status(429).send('Please wait a minute before requesting a new OTP.');
+    }
+
+    otpStore[email] = { otp, timestamp };
+    setTimeout(() => delete otpStore[email], 300000);
+
+    try {
+        const data = await fs.readFile(path.join(__dirname, 'otp-email.html'), 'utf8');
+        const htmlContent = data.replace('{Name}', name).replace('{OTP}', otp);
+
+        await transporter.sendMail({
+            from: process.env.SMTP_USER,
+            to: email,
+            subject: 'Your OTP Code',
+            html: htmlContent,
+            attachments: [{
+                filename: 'logo.png',
+                path: path.join(__dirname, 'public', 'econlogo.png'),
+                cid: 'logo'
+            }]
+        });
+        await logActivity(`Status OTP sent to ${name} at ${email}`);
+        console.log('Status OTP sent successfully to:', email);
+        return res.status(200).send('OTP sent');
+    } catch (error) {
+        console.error('Error sending OTP:', error);
+        return res.status(500).send('Error sending OTP');
+    }
+});
+
+app.post('/verify-status-otp', async (req, res) => {
+    const { email, otp } = req.body;
+    if (otpStore[email] && otpStore[email].otp === otp) {
+        delete otpStore[email];
+        await logActivity(`Status OTP verified for ${email}`);
+        console.log('Status OTP verified successfully for:', email);
+
+        const [rows] = await db.query('SELECT * FROM registrations WHERE email = ?', [email]);
+        if (rows.length > 0) {
+            const registration = rows[0];
+            const { photo, ...registrationDetails } = registration;
+            await logActivity(`Registration data fetched for ${email}`);
+            return res.status(200).json({
+                status: 'Found',
+                message: "Data Found Successfully! Your Registration Details are:",
+                details: registrationDetails
+            });
+        } else {
+            await logActivity(`No registration data found for ${email}`);
+            return res.status(404).json({
+                status: 'Not Found',
+                message: "Data Not Found! If you have registered, contact our support team."
+            });
+        }
+    } else {
+        await logActivity(`Invalid or expired status OTP for ${email}`);
+        console.log('Invalid or expired status OTP for:', email);
+        return res.status(400).send('Invalid or expired OTP');
+    }
+});
+
 async function assignSymbolNumber(nearestExamCenter) {
     try {
         const [rows] = await db.query('SELECT last_assigned_number FROM exam_center_numbers WHERE center_name = ?', [nearestExamCenter]);
