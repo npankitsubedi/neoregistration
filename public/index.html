@@ -4,182 +4,200 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="econlogo.png" rel="icon" type="image/png" />
-    <title>Registration Form</title>
+    <title>Registration Portal - Nepal Economics Olympiad 2025</title>
     <link href="style.css" rel="stylesheet" />
     <script defer src="script.js"></script>
 </head>
 <body>
-<div class="form-container">
-    <div class="form-heading">
-        <img alt="EconLogo" src="econlogo.png" />
-        <h1>Nepal Economics Olympiad - 2025</h1>
-        <h1>Registration Form</h1>
-    </div>
-
-    <div class="message-container"></div>
-
-    <form action="/register" enctype="multipart/form-data" id="registrationForm" method="post">
-        <div id="step1">
-            <div class="form-group">
-                <label for="name">Name</label>
-                <input id="name" name="name" placeholder="Name" required="" type="text" />
-            </div>
-
-            <div class="form-group">
-                <label for="contactNumber">Contact Number</label>
-                <input id="contactNumber" name="contactNumber" placeholder="Contact Number" required="" type="tel" />
-            </div>
-
-            <div class="form-group">
-                <label for="email">Email Address</label>
-                <div class="email-group">
-                    <input id="email" name="email" placeholder="Email Address" required="" type="email" />
-                    <button id="sendOtpButton" type="button">Send OTP</button>
+<div class="main-container">
+    <div class="form-container">
+        <div class="form-heading">
+            <img alt="EconLogo" src="econlogo.png" />
+            <h1>Nepal Economics Olympiad 2025</h1>
+            <h3>Registration Portal</h3>
+            <h4>Welcome to NEO Registration Portal.</h4>
+            <h4>How may we help you, today?</h4>
+        </div>
+        <div class="message-container"></div>
+        <div class="main-options">
+            <button id="newRegistrationButton">New Registration</button>
+            <button id="checkStatusButton">Check Registration Status</button>
+        </div>
+        <form action="/register" enctype="multipart/form-data" id="registrationForm" method="post" style="display: none;">
+            <div id="step1">
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input id="name" name="name" placeholder="Name" required="" type="text" />
                 </div>
-                <div class="send-otp-message"></div>
+                <div class="form-group">
+                    <label for="contactNumber">Contact Number</label>
+                    <input id="contactNumber" name="contactNumber" placeholder="Contact Number" required="" type="tel" />
+                </div>
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <div class="email-group">
+                        <input id="email" name="email" placeholder="Email Address" required="" type="email" />
+                        <button id="sendOtpButton" type="button">Send OTP</button>
+                    </div>
+                    <div class="send-otp-message"></div>
+                </div>
+                <div class="form-group otp-section" style="display: none;">
+                    <label for="otp">Enter OTP</label>
+                    <input id="otp" name="otp" placeholder="Enter OTP" required="" type="text" />
+                    <button id="verifyOtpButton" type="button">Verify OTP</button>
+                    <div class="verify-otp-message"></div>
+                    <div id="resendOtpTimer" style="display: none;">Resend OTP in <span id="timer">0</span> seconds</div>
+                </div>
             </div>
-
-            <div class="form-group otp-section" style="display: none;">
-                <label for="otp">Enter OTP</label>
-                <input id="otp" name="otp" placeholder="Enter OTP" required="" type="text" />
-                <button id="verifyOtpButton" type="button">Verify OTP</button>
-                <div class="verify-otp-message"></div>
-                <div id="resendOtpTimer" style="display: none;">Resend OTP in <span id="timer">0</span> seconds</div>
+            <div id="step2" style="display: none;">
+                <div class="form-group">
+                    <label for="gender">Gender</label>
+                    <select id="gender" name="gender" required="">
+                        <option disabled="disabled" selected="selected" value="">Select your gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="class">Class</label>
+                    <select id="class" name="class" required="">
+                        <option disabled="disabled" selected="selected" value="">Select your class</option>
+                        <option value="11">11 or AS Level</option>
+                        <option value="12">12 or A2 Level</option>
+                        <option value="other">Other</option>
+                        <option value="gapYear">Gap Year</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="district">District</label>
+                    <input id="district" name="district" placeholder="District" required="" type="text" />
+                </div>
+                <div class="form-group">
+                    <label for="province">Province</label>
+                    <select id="province" name="province" required="">
+                        <option disabled="disabled" selected="selected" value="">Select your province</option>
+                        <option value="Koshi">Koshi</option>
+                        <option value="Madesh">Madesh</option>
+                        <option value="Bagmati">Bagmati</option>
+                        <option value="Gandaki">Gandaki</option>
+                        <option value="Lumbini">Lumbini</option>
+                        <option value="Karnali">Karnali</option>
+                        <option value="Sudurpashchim">Sudurpashchim</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="address">Address</label>
+                    <input id="address" name="address" placeholder="Address" required="" type="text" />
+                </div>
+                <div class="form-group">
+                    <label for="date">Date of Birth (in AD)</label>
+                    <input id="date" name="date" required="" type="date" />
+                </div>
+                <div class="form-group">
+                    <label for="schoolName">School Name</label>
+                    <input id="schoolName" name="schoolName" placeholder="School Name" required="" type="text" />
+                </div>
+                <div class="form-group">
+                    <label for="schoolAddress">School Address</label>
+                    <input id="schoolAddress" name="schoolAddress" placeholder="School Address" required="" type="text" />
+                </div>
+                <div class="form-group">
+                    <label for="nearestExamCenter">Nearest Exam Center</label>
+                    <select id="nearestExamCenter" name="nearestExamCenter" required="">
+                        <option disabled="disabled" selected="selected" value="">Nearest Exam Center</option>
+                        <option value="Kathmandu">Kathmandu</option>
+                        <option value="Pokhara">Pokhara</option>
+                        <option value="Birgunj">Birgunj</option>
+                        <option value="Janakpur">Janakpur</option>
+                        <option value="Itahari">Itahari</option>
+                        <option value="Chitwan">Chitwan</option>
+                        <option value="Surkhet">Surkhet</option>
+                        <option value="Butwal">Butwal</option>
+                        <option value="Mahendranagar">Mahendranagar</option>
+                        <option value="Dhangadi">Dhangadi</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="parentsName">Parents Name</label>
+                    <input id="parentsName" name="parentsName" placeholder="Parents Name" required="" type="text" />
+                </div>
+                <div class="form-group">
+                    <label for="parentsContactNumber">Parents Contact Number</label>
+                    <input id="parentsContactNumber" name="parentsContactNumber" placeholder="Parents Contact Number" required="" type="tel" />
+                </div>
+                <div class="form-group">
+                    <label for="principalName">Principal/Coordinator Name</label>
+                    <input id="principalName" name="principalName" placeholder="Principal/Coordinator Name" required="" type="text" />
+                </div>
+                <div class="form-group">
+                    <label for="principalContactNumber">Principal/Coordinator Number</label>
+                    <input id="principalContactNumber" name="principalContactNumber" placeholder="Principal/Coordinator Number" required="" type="tel" />
+                </div>
+                <div class="form-group">
+                    <label for="source">How did you hear about us?</label>
+                    <select id="source" name="source" required="">
+                        <option disabled="disabled" selected="selected" value="">Select an option</option>
+                        <option value="School/College">School/College</option>
+                        <option value="Facebook">Facebook</option>
+                        <option value="Instagram">Instagram</option>
+                        <option value="Google Search">Google Search</option>
+                        <option value="Others">Others</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="photo">Photo</label>
+                    <input accept="image/*" id="photo" name="photo" required="" type="file" />
+                    <small>Photo should not exceed 500KB and must be of type jpg, jpeg or png!</small>
+                    <div class="photo-error" style="color: red; display: none;"></div>
+                    <div class="photo-message" style="color: green; display: none;"></div>
+                </div>
+                <button id="registerButton" type="submit" disabled>Register</button>
+            </div>
+        </form>
+        <div id="statusForm" style="display: none;">
+            <div class="form-group">
+                <label for="statusName">Name</label>
+                <input id="statusName" name="statusName" placeholder="Name" required="" type="text" />
+            </div>
+            <div class="form-group">
+                <label for="statusDob">Date of Birth (in AD)</label>
+                <input id="statusDob" name="statusDob" placeholder="Date of Birth" required="" type="date" />
+            </div>
+            <div class="form-group">
+                <label for="statusContactNumber">Contact Number</label>
+                <input id="statusContactNumber" name="statusContactNumber" placeholder="Contact Number" required="" type="tel" />
+            </div>
+            <div class="form-group">
+                <label for="statusEmail">Email Address</label>
+                <input id="statusEmail" name="statusEmail" placeholder="Email Address" required="" type="email" />
+            </div>
+            <button id="sendStatusOtpButton" type="button">Send OTP</button>
+            <div class="form-group otp-section-status" style="display: none;">
+                <label for="statusOtp">Enter OTP</label>
+                <input id="statusOtp" name="statusOtp" placeholder="Enter OTP" required="" type="text" />
+                <button id="verifyStatusOtpButton" type="button">Verify OTP</button>
+                <div class="verify-status-otp-message"></div>
+                <div id="resendOtpTimerStatus" style="display: none;">Resend OTP in <span id="timerStatus">0</span> seconds</div>
             </div>
         </div>
-
-        <div id="step2" style="display: none;">
-            <div class="form-group">
-                <label for="gender">Gender</label>
-                <select id="gender" name="gender" required="">
-                    <option disabled="disabled" selected="selected" value="">Select your gender</option>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                    <option value="Other">Other</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="class">Class</label>
-                <select id="class" name="class" required="">
-                    <option disabled="disabled" selected="selected" value="">Select your class</option>
-                    <option value="11">11 or AS Level</option>
-                    <option value="12">12 or A2 Level</option>
-                    <option value="other">Other</option>
-                    <option value="gapYear">Gap Year</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="district">District</label>
-                <input id="district" name="district" placeholder="District" required="" type="text" />
-            </div>
-
-            <div class="form-group">
-                <label for="province">Province</label>
-                <select id="province" name="province" required="">
-                    <option disabled="disabled" selected="selected" value="">Select your province</option>
-                    <option value="Province 1">Koshi</option>
-                    <option value="Province 2">Madesh</option>
-                    <option value="Bagmati">Bagmati</option>
-                    <option value="Gandaki">Gandaki</option>
-                    <option value="Lumbini">Lumbini</option>
-                    <option value="Karnali">Karnali</option>
-                    <option value="Sudurpashchim">Sudurpashchim</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="address">Address</label>
-                <input id="address" name="address" placeholder="Address" required="" type="text" />
-            </div>
-
-            <div class="form-group">
-                <label for="date">Date of Birth (in AD)</label>
-                <input id="date" name="date" required="" type="date" />
-            </div>
-
-            <div class="form-group">
-                <label for="schoolName">School Name</label>
-                <input id="schoolName" name="schoolName" placeholder="School Name" required="" type="text" />
-            </div>
-
-            <div class="form-group">
-                <label for="schoolAddress">School Address</label>
-                <input id="schoolAddress" name="schoolAddress" placeholder="School Address" required="" type="text" />
-            </div>
-
-            <div class="form-group">
-                <label for="nearestExamCenter">Nearest Exam Center</label>
-                <select id="nearestExamCenter" name="nearestExamCenter" required="">
-                    <option disabled="disabled" selected="selected" value="">Nearest Exam Center</option>
-                    <option value="Kathmandu">Kathmandu</option>
-                    <option value="Pokhara">Pokhara</option>
-                    <option value="Birgunj">Birgunj</option>
-                    <option value="Janakpur">Janakpur</option>
-                    <option value="Itahari">Itahari</option>
-                    <option value="Chitwan">Chitwan</option>
-                    <option value="Surkhet">Surkhet</option>
-                    <option value="Butwal">Butwal</option>
-                    <option value="Mahendranagar">Mahendranagar</option>
-                    <option value="Dhangadi">Dhangadi</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="parentsName">Parents Name</label>
-                <input id="parentsName" name="parentsName" placeholder="Parents Name" required="" type="text" />
-            </div>
-
-            <div class="form-group">
-                <label for="parentsContactNumber">Parents Contact Number</label>
-                <input id="parentsContactNumber" name="parentsContactNumber" placeholder="Parents Contact Number" required="" type="tel" />
-            </div>
-
-            <div class="form-group">
-                <label for="principalName">Principal/Coordinator Name</label>
-                <input id="principalName" name="principalName" placeholder="Principal/Coordinator Name" required="" type="text" />
-            </div>
-
-            <div class="form-group">
-                <label for="principalContactNumber">Principal/Coordinator Number</label>
-                <input id="principalContactNumber" name="principalContactNumber" placeholder="Principal/Coordinator Number" required="" type="tel" />
-            </div>
-
-            <div class="form-group">
-                <label for="source">How did you hear about us?</label>
-                <select id="source" name="source" required="">
-                    <option disabled="disabled" selected="selected" value="">Select an option</option>
-                    <option value="School/College">School/College</option>
-                    <option value="Facebook">Facebook</option>
-                    <option value="Instagram">Instagram</option>
-                    <option value="Google Search">Google Search</option>
-                    <option value="Others">Others</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="photo">Photo</label>
-                <input accept="image/*" id="photo" name="photo" required="" type="file" />
-                <small>Photo should not exceed 500KB and must be of type jpg, jpeg or png!</small>
-                <div class="photo-error" style="color: red; display: none;"></div>
-                <div class="photo-message" style="color: green; display: none;"></div>
-            </div>
-
-            <button id="registerButton" type="submit" disabled>Register</button>
+        <div id="statusMessage" style="display: none; text-align: center;">
+            <h2>Registration Status</h2>
+            <p id="statusMessageText"></p>
+            <div id="statusDetailsContainer"></div>
         </div>
-    </form>
-
-    <div id="thankYouMessage" style="display: none; text-align: center;">
-        <h2>Thank you for filling out the form.</h2>
-        <p>Please check your email for the Admit Card. If you don't receive it, kindly check the SPAM or Promotions folder.</p>
-        <p>For any queries, please do not hesitate to reach out to us at <a href="mailto:hi@ecolympnepal.org">hi@ecolympnepal.org</a>.</p>
+        <div id="thankYouMessage" style="display: none; text-align: center;">
+            <h2>Thank you for filling out the form.</h2>
+            <p>Please check your email for the Admit Card. If you don't receive it, kindly check the SPAM or Promotions folder.</p>
+            <p>For any queries, please do not hesitate to reach out to us at <a href="mailto:hi@ecolympnepal.org">hi@ecolympnepal.org</a>.</p>
+        </div>
+        <div id="loading" class="loading-overlay" style="display: none;">
+            <div class="loading-spinner">
+                <img src="econlogo.png" alt="Loading...">
+            </div>
+            <p>Loading, please wait...</p>
+        </div>
     </div>
-    <div id="loading" class="loading-overlay" style="display: none;">
-      <div class="loading-spinner">
-        <img src="econlogo.png" alt="Loading...">
-      </div>
-      <p>Loading, please wait...</p>
-    </div>
+</div>
 </body>
 </html>
